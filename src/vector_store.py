@@ -5,19 +5,14 @@ from langchain_community.vectorstores import Chroma
 import os
 
 def create_vector_db(input_csv, db_path):
-    # 1. Load Data
     df = pd.read_csv(input_csv)
     
-    # 2. Stratified Sampling (10k-15k)
-    # This ensures we get a fair mix of all 5 products
     sample_size = min(12000, len(df))
     df_sample = df.groupby('Product', group_keys=False).apply(
         lambda x: x.sample(n=int(sample_size * len(x) / len(df)))
     )
     print(f"Sampled {len(df_sample)} complaints for indexing.")
 
-    # 3. Text Chunking
-    # We use 500 chars with 50 char overlap to keep context across splits
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
         chunk_overlap=50,
@@ -39,11 +34,10 @@ def create_vector_db(input_csv, db_path):
                 "chunk_index": i
             })
 
-    # 4. Initialize Embedding Model
+
     print("Loading embedding model (all-MiniLM-L6-v2)...")
     embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-    # 5. Create and Persist Vector Store (ChromaDB)
     print("Creating vector index... this may take a few minutes.")
     vector_db = Chroma.from_texts(
         texts=chunks,

@@ -8,3 +8,9 @@ langchain
 langchain-community
 sentence-transformers
 chromadb
+dotenv
+langchain-huggingface
+langchain-chroma
+transformers
+torch
+gradio
